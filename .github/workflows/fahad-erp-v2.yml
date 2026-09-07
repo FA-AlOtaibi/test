@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Restore source archive
         run: |
-          base64 --decode FahadERP-v2/source.zip.b64 > /tmp/fahad-erp-v2.zip
+          base64 -D -i FahadERP-v2/source.zip.b64 -o /tmp/fahad-erp-v2.zip
           unzip -q /tmp/fahad-erp-v2.zip -d FahadERP-v2
       - name: Install XcodeGen
         run: brew install xcodegen
