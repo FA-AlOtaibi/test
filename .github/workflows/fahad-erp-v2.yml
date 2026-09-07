@@ -10,16 +10,20 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+      - name: Restore source archive
+        run: |
+          base64 --decode FahadERP-v2/source.zip.b64 > /tmp/fahad-erp-v2.zip
+          unzip -q /tmp/fahad-erp-v2.zip -d FahadERP-v2
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Generate Xcode project
-        working-directory: FahadERP-v2
+        working-directory: FahadERP-v2/FahadERP
         run: xcodegen generate
       - name: Resolve packages
-        working-directory: FahadERP-v2
+        working-directory: FahadERP-v2/FahadERP
         run: xcodebuild -resolvePackageDependencies -project FahadERP.xcodeproj -scheme FahadERP
       - name: Build unsigned app
-        working-directory: FahadERP-v2
+        working-directory: FahadERP-v2/FahadERP
         run: |
           xcodebuild \
             -project FahadERP.xcodeproj \
@@ -32,7 +36,7 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             clean build
       - name: Package IPA
-        working-directory: FahadERP-v2
+        working-directory: FahadERP-v2/FahadERP
         run: |
           rm -rf Payload FahadERP-v2-unsigned.ipa
           mkdir -p Payload
@@ -41,4 +45,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: FahadERP-v2-IPA
-          path: FahadERP-v2/FahadERP-v2-unsigned.ipa
+          path: FahadERP-v2/FahadERP/FahadERP-v2-unsigned.ipa
