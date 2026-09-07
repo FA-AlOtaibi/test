@@ -10,10 +10,6 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
-      - name: Restore source archive
-        run: |
-          base64 -D -i FahadERP-v2/source.zip.b64 -o /tmp/fahad-erp-v2.zip
-          unzip -q /tmp/fahad-erp-v2.zip -d FahadERP-v2
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Generate Xcode project
