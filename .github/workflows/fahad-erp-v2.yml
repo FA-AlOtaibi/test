@@ -1,0 +1,37 @@
+name: Fahad ERP v2 IPA
+
+on:
+  push:
+    branches: [ erp-v2-build ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Recreate source
+        run: |
+          cat source.part* > source.b64
+          base64 --decode source.b64 > source.zip
+          mkdir app && cd app
+          unzip ../source.zip
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate project
+        working-directory: app
+        run: xcodegen generate
+      - name: Build unsigned app
+        working-directory: app
+        run: |
+          xcodebuild -project FahadERP.xcodeproj -scheme FahadERP -sdk iphoneos -configuration Release -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" clean build
+      - name: Package IPA
+        working-directory: app
+        run: |
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/FahadERP.app Payload/
+          zip -r FahadERP-v2.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FahadERP-v2-IPA
+          path: app/FahadERP-v2.ipa
